@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
     public float runSpeed = 40f;
     private float horizontalMove = 0f;
     private bool jump;
+    private bool Atack1 = false;
 
     // Start is called before the first frame update
     void Start()
@@ -29,6 +30,18 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetButtonDown("Jump"))
             jump = true;
 
+        if (Input.GetButtonDown("Fire1"))
+        {
+            animator.SetBool("Atack1", true);
+        }
+
+
+
+    }
+
+    void Atack1Finished()
+    {
+        animator.SetBool("Atack1", false);
     }
 
     private void FixedUpdate()
