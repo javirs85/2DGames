@@ -1,17 +1,21 @@
-﻿using System.Collections;
+﻿using Assets;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+
     private Rigidbody2D rb;
     private CharacterController2D controller;
     private Animator animator;
-
-    public float runSpeed = 40f;
     private float horizontalMove = 0f;
     private bool jump;
-    private bool Atack1 = false;
+    private AttackController attackController;
+
+    public float runSpeed = 40f;
+    public Animator WeaponEffectsAnimator;
+   
 
     // Start is called before the first frame update
     void Start()
@@ -19,6 +23,11 @@ public class PlayerMovement : MonoBehaviour
         controller = this.GetComponent<CharacterController2D>();
         animator = this.GetComponent<Animator>();
         rb = this.GetComponent<Rigidbody2D>();
+
+        attackController = new AttackController(animator, WeaponEffectsAnimator);
+
+        GameController.Init();
+
     }
 
     // Update is called once per frame
@@ -32,17 +41,22 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetButtonDown("Fire1"))
         {
-            animator.SetBool("Atack1", true);
+            attackController.Slash(controller.IsGrounded);           
         }
-
-
-
     }
 
-    void Atack1Finished()
+
+    /*
+
+    // hooks for animation events
+
+    void Slash1Finished(string animation)
     {
-        animator.SetBool("Atack1", false);
+        if (animation == "Slash1")
+            animator.SetBool("Atack1", false);
     }
+   */
+    
 
     private void FixedUpdate()
     {
