@@ -8,7 +8,7 @@ namespace Assets
 {
     public interface IAttackable
     {
-        int maxHP { get; set; }
+        int MaxHP { get; set; }
         int CurrentHP { get; set; }
         void ReceiveDamange(int HP);
 

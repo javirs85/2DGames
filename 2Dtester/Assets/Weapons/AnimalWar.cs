@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Assets
+namespace Assets.Weapons
 {
-    class Sword : IWeapon
+    public class AnimalWar : IWeapon
     {
         private int damage = 1;
 
         public int Damage { get => damage; set => damage = value; }
 
-        public float CoolDownSeconds => 0.2f;
-        public float ComboSeconds => 0.05f;
+        public float CoolDownSeconds => 0;
+        public float ComboSeconds => 0;
     }
 }
