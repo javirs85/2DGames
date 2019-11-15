@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Assets
 {
@@ -10,7 +11,7 @@ namespace Assets
     {
         int MaxHP { get; set; }
         int CurrentHP { get; set; }
-        void ReceiveDamange(int HP);
+        void ReceiveDamange(int HP, Vector3 SourceOfHarm);
 
     }
 

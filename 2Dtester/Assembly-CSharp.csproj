@@ -65,8 +65,8 @@
     <Compile Include="Assets\Attacker.cs" />
     <Compile Include="Assets\GameController.cs" />
     <Compile Include="Assets\herizo.cs" />
-    <Compile Include="Assets\HeroWeaponEffecter.cs" />
     <Compile Include="Assets\ifaces.cs" />
+    <Compile Include="Assets\JumpImprover.cs" />
     <Compile Include="Assets\PlayerMovement.cs" />
     <Compile Include="Assets\Scripts\CharacterController2D.cs" />
     <Compile Include="Assets\WeaponEffectsController.cs" />
@@ -77,6 +77,9 @@
     </Reference>
     <Reference Include="Cinemachine">
       <HintPath>C:/Users/rodriguez/Documents/GitHub/2DGames/2Dtester/Library/ScriptAssemblies/Cinemachine.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.2D.Animation.Runtime">
+      <HintPath>C:/Users/rodriguez/Documents/GitHub/2DGames/2Dtester/Library/ScriptAssemblies/Unity.2D.Animation.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VSCode.Editor">
       <HintPath>C:/Users/rodriguez/Documents/GitHub/2DGames/2Dtester/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
@@ -114,6 +117,9 @@
     <Reference Include="Unity.Timeline">
       <HintPath>C:/Users/rodriguez/Documents/GitHub/2DGames/2Dtester/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.2D.Animation.Triangle.Runtime">
+      <HintPath>C:/Users/rodriguez/Documents/GitHub/2DGames/2Dtester/Library/ScriptAssemblies/Unity.2D.Animation.Triangle.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="PsdPlugin">
       <HintPath>C:/Users/rodriguez/Documents/GitHub/2DGames/2Dtester/Library/ScriptAssemblies/PsdPlugin.dll</HintPath>
     </Reference>
@@ -150,6 +156,9 @@
     <Reference Include="Unity.2D.SpriteShape.Runtime">
       <HintPath>C:/Users/rodriguez/Documents/GitHub/2DGames/2Dtester/Library/ScriptAssemblies/Unity.2D.SpriteShape.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.2D.Animation.Editor">
+      <HintPath>C:/Users/rodriguez/Documents/GitHub/2DGames/2Dtester/Library/ScriptAssemblies/Unity.2D.Animation.Editor.dll</HintPath>
+    </Reference>
     <Reference Include="com.unity.cinemachine.editor">
       <HintPath>C:/Users/rodriguez/Documents/GitHub/2DGames/2Dtester/Library/ScriptAssemblies/com.unity.cinemachine.editor.dll</HintPath>
     </Reference>
@@ -173,15 +182,6 @@
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>C:/Users/rodriguez/Documents/GitHub/2DGames/2Dtester/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.2D.Animation.Runtime">
-      <HintPath>C:/Users/rodriguez/Documents/GitHub/2DGames/2Dtester/Library/ScriptAssemblies/Unity.2D.Animation.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.2D.Animation.Triangle.Runtime">
-      <HintPath>C:/Users/rodriguez/Documents/GitHub/2DGames/2Dtester/Library/ScriptAssemblies/Unity.2D.Animation.Triangle.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.2D.Animation.Editor">
-      <HintPath>C:/Users/rodriguez/Documents/GitHub/2DGames/2Dtester/Library/ScriptAssemblies/Unity.2D.Animation.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.2.12f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>

@@ -1,11 +1,12 @@
 ﻿using Assets;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Attacker : MonoBehaviour
 {
-    public Animator EffectsAnimator;
+    public WeaponEffectsController EffectsController;
     public Animator MovementAnimator;
 
     public Transform attackPos;
@@ -41,24 +42,31 @@ public class Attacker : MonoBehaviour
 
     void DoSimpleSlash()
     {
-        Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPos.position, AttackRange, WhatIsEnamyLayer);
-        foreach(var enemy in enemiesToDamage)
-        {
-            enemy.GetComponent<IAttackable>().ReceiveDamange(GameController.CurrentWeapon.Damage);
-        }
-
-        FireAnimation(Animations.Slash1);
+        DamageOnSlash(GameController.CurrentWeapon.Damage);
+        EffectsController.FireAnimation(Animations.Slash1);
         if (isGrounded)
             MovementAnimator.SetTrigger("Attack1");
 
+    }
+
+    private void DamageOnSlash(int hitpoints)
+    {
+        Collider2D[] enemiesToDamage = Physics2D.OverlapCircleAll(attackPos.position, AttackRange, WhatIsEnamyLayer);
+        foreach (var enemy in enemiesToDamage)
+        {
+            enemy.GetComponent<IAttackable>().ReceiveDamange(hitpoints, transform.position);
+        }
     }
 
     void DoGreatSlash()
     {
-        FireAnimation(Animations.Slash2);
+        DamageOnSlash(GameController.CurrentWeapon.Damage+3);
+        EffectsController.FireAnimation(Animations.Slash2);
         if (isGrounded)
             MovementAnimator.SetTrigger("Attack1");
     }
+
+
 
     public void Slash(bool _isGrounded)
     {
@@ -103,18 +111,5 @@ public class Attacker : MonoBehaviour
             Debug.Log("CoolingDown: " + Time.time + " , " + NextValidFireTime + ", " + NextComboTime);
     }
 
-    public void FireAnimation(Animations anim)
-    {
-        switch (anim)
-        {
-            case Animations.Slash1:
-                EffectsAnimator.SetTrigger("Slash1Start");
-                break;
-            case Animations.Slash2:
-                EffectsAnimator.SetTrigger("Slash2Combo");
-                break;
-            default:
-                break;
-        }
-    }
+    
 }
