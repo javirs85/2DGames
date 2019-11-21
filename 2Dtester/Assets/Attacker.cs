@@ -55,6 +55,8 @@ public class Attacker : MonoBehaviour
         foreach (var enemy in enemiesToDamage)
         {
             enemy.GetComponent<IAttackable>().ReceiveDamange(hitpoints, transform.position);
+            EffectsController.HitSimple();
+            controller.KickBack();
         }
     }
 

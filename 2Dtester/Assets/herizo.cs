@@ -10,6 +10,8 @@ namespace Assets.Enemies
     public class herizo : MonoBehaviour, IEnemy, IAttackable
     {
 
+        public event EventHandler IDied;
+
         private Material DefaultMaterial;
 
         IWeapon _currentWeapon = new Assets.Weapons.AnimalWar();
@@ -20,9 +22,8 @@ namespace Assets.Enemies
         List<SpriteRenderer> AllRenderers;
         private bool deactivated = false; //we've been hit
 
-
-        int _maxHP = 10;
-        public int MaxHP { get => _maxHP; set => throw new System.NotImplementedException(); }
+        
+        public int MaxHP { get => HP; set => HP = value; }
 
         int _currentHP;
         public int CurrentHP { get => _currentHP; set => _currentHP = value; }
@@ -34,16 +35,20 @@ namespace Assets.Enemies
         public Material WhiteMaterial;
         public Material OrangeMaterial;
         public SpriteRenderer SprRenderer;
+        public GameObject HitEffect;
+
 
         IWeapon IEnemy.CurrentWeapon { get => _currentWeapon; set => _currentWeapon = value; }
         public int JumpWhenHitXFactor;
         public int JumpWhenHitYFactor;
-        public int MovementSpeed;
+        public float MovementSpeed;
+        public int HP = 2;
 
         //move related private variables
         private Vector3 m_Velocity = Vector3.zero;
         [Range(0, .3f)] [SerializeField] private float m_MovementSmoothing = .05f;  // How much to smooth out the movement
         private bool m_FacingRight = false;  // For determining which way the player is currently facing.
+        private List<GameObject> instances;
         
 
         private void Awake()
@@ -56,28 +61,43 @@ namespace Assets.Enemies
             HeroCollider = GetComponent<BoxCollider2D>();
 
             AllRenderers = this.GetComponentsInChildren<SpriteRenderer>().ToList();
+            instances = new List<GameObject>();
+            
         }
 
         public void ReceiveDamange(int HP, Vector3 SourceOfHarm)
         {
-            animator.SetTrigger("Hit");
-
-            if (HP >= 2)
-                SetToWhiteSeconds(WhiteMaterial, 0.1f);
-            else
-                SetToWhiteSeconds(OrangeMaterial, 0.1f);
-
-            DeactivateColliderSeconds(0.2f);
-
-            Instantiate(BloodSpat, transform.position, Quaternion.identity);
-            AudioSource.PlayClipAtPoint(HitAudio, transform.position);
-
-            PushAwayFromAttacker(SourceOfHarm);
-
             CurrentHP -= HP;
             Debug.Log($"{this.name} hit with {HP} points, we now have {CurrentHP} HP");
-            if (CurrentHP < 0)
-                Die();
+
+            if (CurrentHP <= 0)
+            {
+                /*   DIE   */
+
+                instances.Add(Instantiate(HitEffect, transform.position, Quaternion.identity));
+                AudioSource.PlayClipAtPoint(DieAudio, transform.position);
+                animator.SetTrigger("DieAnim"); //DieAnimationFinished will be called when the animation is finished
+                AllRenderers.ForEach(x => x.material = OrangeMaterial);
+                deactivated = true;
+            }
+            else
+            {
+                float invulnerableTime = 0.2f;
+
+                animator.SetTrigger("Hit");
+
+                if (HP >= 2)
+                    SetToWhiteSeconds(WhiteMaterial, invulnerableTime);
+                else
+                    SetToWhiteSeconds(OrangeMaterial, invulnerableTime);
+
+                DeactivateColliderSeconds(invulnerableTime);
+
+                Instantiate(BloodSpat, transform.position, Quaternion.identity);
+                AudioSource.PlayClipAtPoint(HitAudio, transform.position);
+
+                PushAwayFromAttacker(SourceOfHarm);
+            }
         }
 
 
@@ -116,9 +136,10 @@ namespace Assets.Enemies
             AllRenderers.ForEach(x => x.material = DefaultMaterial);
         }
 
-        void Die()
+        void DieAnimationFinished()
         {
-            AudioSource.PlayClipAtPoint(DieAudio, transform.position);
+            instances.ForEach(x => Destroy(x));
+            IDied?.Invoke(this, EventArgs.Empty);
             Destroy(this.gameObject);
         }
 

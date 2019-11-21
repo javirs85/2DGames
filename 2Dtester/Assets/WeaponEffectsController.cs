@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static Attacker;
@@ -8,6 +9,7 @@ public class WeaponEffectsController : MonoBehaviour
     private AudioSource AudioPlayer;
     private Animator EffectsAnimator;
     private List<AudioClip> smallWooshes;
+    private Cinemachine.CinemachineImpulseSource CameraShaker;
 
     public AudioClip Swoosh1;
     public AudioClip Swoosh2;
@@ -21,6 +23,7 @@ public class WeaponEffectsController : MonoBehaviour
     {
         EffectsAnimator = this.GetComponent<Animator>();
         AudioPlayer = this.GetComponent<AudioSource>();
+        CameraShaker = this.GetComponent<Cinemachine.CinemachineImpulseSource>();
         smallWooshes = new List<AudioClip>();
         smallWooshes.Add(Swoosh1);
         smallWooshes.Add(Swoosh2);
@@ -34,7 +37,7 @@ public class WeaponEffectsController : MonoBehaviour
             case Animations.Slash1:
                 EffectsAnimator.SetTrigger("Slash1Start");
 
-                var audio = smallWooshes[Random.Range(0, smallWooshes.Count)];   
+                var audio = smallWooshes[UnityEngine.Random.Range(0, smallWooshes.Count)];   
                 AudioPlayer.PlayOneShot(audio);
 
                 break;
@@ -45,6 +48,11 @@ public class WeaponEffectsController : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    internal void HitSimple()
+    {
+        CameraShaker.GenerateImpulse(this.transform.position);
     }
 
     // Update is called once per frame

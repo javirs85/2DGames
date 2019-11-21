@@ -1,9 +1,13 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class CharacterController2D : MonoBehaviour
 {
+    [SerializeField] private float m_KickBackForceWhenHit = 10f;                //Force of the kick back when WE land an attack
     [SerializeField] private float m_JumpForce = 400f;                          // Amount of force added when the player jumps.
+    [SerializeField] private float m_JumpStopperForce = 40f;                    // Amount of force substracted from vertical force when release the jump button
+    [SerializeField] private float m_QuickFall = 2f;                            // gravity multipliyer during fall to make asymetric jumping with quick fall
     [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = .36f;          // Amount of maxSpeed applied to crouching movement. 1 = 100%
     [Range(0, .3f)] [SerializeField] private float m_MovementSmoothing = .05f;  // How much to smooth out the movement
     [SerializeField] private bool m_AirControl = false;                         // Whether or not a player can steer while jumping;
@@ -14,6 +18,8 @@ public class CharacterController2D : MonoBehaviour
 
     const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
     private bool m_Grounded;            // Whether or not the player is grounded.
+
+
     const float k_CeilingRadius = .2f; // Radius of the overlap circle to determine if the player can stand up
     private Rigidbody2D m_Rigidbody2D;
     private bool m_FacingRight = true;  // For determining which way the player is currently facing.
@@ -47,6 +53,18 @@ public class CharacterController2D : MonoBehaviour
 
         if (OnCrouchEvent == null)
             OnCrouchEvent = new BoolEvent();
+    }
+
+    private void Update()
+    {
+        if (m_Rigidbody2D.velocity.y < 0) // we are falling
+        {
+            m_Rigidbody2D.velocity += Vector2.up * Physics2D.gravity.y * (m_QuickFall - 1) * Time.deltaTime;
+        }
+        else if (m_Rigidbody2D.velocity.y > 0 && !Input.GetButton("Jump") && !m_Grounded)
+        {
+            m_Rigidbody2D.velocity += Vector2.up * Physics2D.gravity.y * (m_JumpStopperForce - 1) * Time.deltaTime;
+        }
     }
 
     private void FixedUpdate()
@@ -102,6 +120,16 @@ public class CharacterController2D : MonoBehaviour
             m_Rigidbody2D.velocity = m_Rigidbody2D.velocity + new Vector2(0f, m_JumpForce/100);
             //m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
         }
+
+    }
+
+    internal void KickBack()
+    {
+        var kickVector = Vector2.left;
+        if (!m_FacingRight)
+            kickVector = Vector2.right;
+
+        m_Rigidbody2D.AddForce(kickVector * m_KickBackForceWhenHit, ForceMode2D.Impulse);
 
     }
 
