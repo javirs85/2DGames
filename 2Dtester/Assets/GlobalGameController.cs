@@ -19,12 +19,15 @@ public class GlobalGameController : MonoBehaviour
         miny = -2;
         maxy = -1.5f;
 
-        HerizoGO = Instantiate(HerizoPrefab, new Vector3(-2f, -1.75f), Quaternion.identity);
-        Herizo = HerizoGO.GetComponent<herizo>();
-        Herizo.IDied += Herizo_IDied;
+        SpawnHerizo();
     }
 
     private void Herizo_IDied(object sender, System.EventArgs e)
+    {
+        SpawnHerizo();
+    }
+
+    private void SpawnHerizo()
     {
         var x = UnityEngine.Random.Range(minx, maxx);
         var y = UnityEngine.Random.Range(miny, maxy);

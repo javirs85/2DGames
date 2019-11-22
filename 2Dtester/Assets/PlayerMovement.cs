@@ -1,6 +1,7 @@
 ﻿using Assets;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour, IAttackable
@@ -15,15 +16,22 @@ public class PlayerMovement : MonoBehaviour, IAttackable
     int _maxHP = 10;
     int _currentHP;
     float LostInmuneNextTime;
-
+    private bool CanDash = true;
+    private Material defaultMaterial;
+    private List<SpriteRenderer> AllRenderers;
+    private Cinemachine.CinemachineImpulseSource CameraShaker;
 
 
     public float runSpeed = 40f;
     public float FlyOnHitForce;
     public float HitInmunneSeconds;
+    public Material BlackMaterial;
+    public GameObject HitEffect;
 
     public int MaxHP { get => _maxHP; set => throw new System.NotImplementedException(); }
     public int CurrentHP { get =>_currentHP; set => _currentHP = value; }
+
+
     
 
 
@@ -33,12 +41,21 @@ public class PlayerMovement : MonoBehaviour, IAttackable
         CurrentHP = MaxHP;
 
         controller = this.GetComponent<CharacterController2D>();
+        controller.Landed += Controller_Landed;
         animator = this.GetComponent<Animator>();
         rb = this.GetComponent<Rigidbody2D>();
-        
+        CameraShaker = this.GetComponent<Cinemachine.CinemachineImpulseSource>();
 
+        AllRenderers = this.GetComponentsInChildren<SpriteRenderer>().ToList();
+
+        defaultMaterial = GetComponent<SpriteRenderer>().material;
         GameController.Init(this);
 
+    }
+
+    private void Controller_Landed(object sender, System.EventArgs e)
+    {
+        CanDash = true;
     }
 
     // Update is called once per frame
@@ -51,12 +68,20 @@ public class PlayerMovement : MonoBehaviour, IAttackable
             animator.SetFloat("VSpeed", rb.velocity[1]);
             if (Input.GetButtonDown("Jump"))
                 jump = true;
+            if (Input.GetButtonDown("Fire2") && CanDash && !controller.IsGrounded)
+            {
+                CanDash = false;
+                controller.Dash();
+            }
         }
         else
         {
             horizontalMove = 0;
             if (Time.time >= LostInmuneNextTime)
+            {
+                AllRenderers.ForEach(x => x.material = defaultMaterial);
                 WasHit = false;
+            }
         }
     }
     
@@ -67,6 +92,7 @@ public class PlayerMovement : MonoBehaviour, IAttackable
         {
             controller.Move(horizontalMove * Time.fixedDeltaTime, false, jump);
         }
+        
         jump = false;
     }
 
@@ -75,8 +101,11 @@ public class PlayerMovement : MonoBehaviour, IAttackable
         if (WasHit)
             return; //we are in inmune time, we dont give a shit
 
+        Instantiate(HitEffect, transform.position, Quaternion.identity);
+        CameraShaker.GenerateImpulse(this.transform.position);
         WasHit = true;
         LostInmuneNextTime = Time.time + HitInmunneSeconds;
+        AllRenderers.ForEach(x => x.material = BlackMaterial);
 
         _currentHP -= HP;
         Debug.Log($"We've been hit with {HP} points, we now have {CurrentHP} HP");

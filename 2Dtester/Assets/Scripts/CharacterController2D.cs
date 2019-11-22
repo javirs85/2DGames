@@ -4,6 +4,10 @@ using UnityEngine.Events;
 
 public class CharacterController2D : MonoBehaviour
 {
+    [SerializeField] private float m_DashVeclocity = 10f;                       //Velocity during the dash
+    [SerializeField] private float m_DashTime = 0.5f;                            //time during the dash
+    public GameObject DashEffect;
+
     [SerializeField] private float m_KickBackForceWhenHit = 10f;                //Force of the kick back when WE land an attack
     [SerializeField] private float m_JumpForce = 400f;                          // Amount of force added when the player jumps.
     [SerializeField] private float m_JumpStopperForce = 40f;                    // Amount of force substracted from vertical force when release the jump button
@@ -15,6 +19,12 @@ public class CharacterController2D : MonoBehaviour
     [SerializeField] private Transform m_GroundCheck;                           // A position marking where to check if the player is grounded.
     [SerializeField] private Transform m_CeilingCheck;                          // A position marking where to check for ceilings
     [SerializeField] private Collider2D m_CrouchDisableCollider;                // A collider that will be disabled when crouching
+   
+
+
+    public event EventHandler Landed;
+
+    public bool IsDashing = false;
 
     const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
     private bool m_Grounded;            // Whether or not the player is grounded.
@@ -24,6 +34,8 @@ public class CharacterController2D : MonoBehaviour
     private Rigidbody2D m_Rigidbody2D;
     private bool m_FacingRight = true;  // For determining which way the player is currently facing.
     private Vector3 m_Velocity = Vector3.zero;
+    
+    
 
     public bool IsGrounded
     {
@@ -81,7 +93,10 @@ public class CharacterController2D : MonoBehaviour
             {
                 m_Grounded = true;
                 if (!wasGrounded)
+                {
+                    Landed?.Invoke(this, EventArgs.Empty);
                     OnLandEvent.Invoke();
+                }
             }
         }
     }
@@ -90,6 +105,11 @@ public class CharacterController2D : MonoBehaviour
 
     public void Move(float move, bool crouch, bool jump)
     {
+        if(IsDashing)
+        {
+            m_Rigidbody2D.velocity = Vector3.SmoothDamp(m_Rigidbody2D.velocity, new Vector2(m_DashVeclocity, 0), ref m_Velocity, m_MovementSmoothing);
+            return;
+        }
         //only control the player if grounded or airControl is turned on
         if (m_Grounded || m_AirControl)
         {
@@ -123,6 +143,23 @@ public class CharacterController2D : MonoBehaviour
 
     }
 
+    public void Dash()
+    {
+        DashEffect.SetActive(true);
+        IsDashing = true;
+        m_Rigidbody2D.gravityScale = 0;
+        m_Rigidbody2D.velocity = new Vector2(m_DashVeclocity, 0);
+        Invoke("FinishDashing", m_DashTime);
+    }
+
+    void FinishDashing()
+    {
+        m_Rigidbody2D.gravityScale = 1;
+        m_Rigidbody2D.velocity = Vector2.zero;
+        DashEffect.SetActive(false);
+        IsDashing = false;
+    }
+
     internal void KickBack()
     {
         var kickVector = Vector2.left;
@@ -137,6 +174,7 @@ public class CharacterController2D : MonoBehaviour
     {
         // Switch the way the player is labelled as facing.
         m_FacingRight = !m_FacingRight;
+        m_DashVeclocity = -m_DashVeclocity;
 
         // Multiply the player's x local scale by -1.
         Vector3 theScale = transform.localScale;
