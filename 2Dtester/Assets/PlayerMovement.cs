@@ -43,6 +43,7 @@ public class PlayerMovement : MonoBehaviour, IAttackable
         controller = this.GetComponent<CharacterController2D>();
         controller.Landed += Controller_Landed;
         animator = this.GetComponent<Animator>();
+        controller.animator = animator;
         rb = this.GetComponent<Rigidbody2D>();
         CameraShaker = this.GetComponent<Cinemachine.CinemachineImpulseSource>();
 

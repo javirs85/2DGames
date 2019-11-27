@@ -23,10 +23,12 @@ public class CharacterController2D : MonoBehaviour
 
 
     public event EventHandler Landed;
-
+    public Animator animator;
     public bool IsDashing = false;
+    public TrailRenderer trail;
 
     const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
+    private bool jumpStarted;
     private bool m_Grounded;            // Whether or not the player is grounded.
 
 
@@ -55,6 +57,7 @@ public class CharacterController2D : MonoBehaviour
 
     public BoolEvent OnCrouchEvent;
     private bool m_wasCrouching = false;
+    private bool isFreeFalling;
 
     private void Awake()
     {
@@ -94,10 +97,19 @@ public class CharacterController2D : MonoBehaviour
                 m_Grounded = true;
                 if (!wasGrounded)
                 {
+                    jumpStarted = false;
+                    isFreeFalling = false;
+                    animator.SetTrigger("Landed");
                     Landed?.Invoke(this, EventArgs.Empty);
                     OnLandEvent.Invoke();
                 }
             }
+        }
+
+        if (!m_Grounded && !jumpStarted && !isFreeFalling && m_Rigidbody2D.velocity.y < 0)
+        {
+            isFreeFalling = true;
+            animator.SetTrigger("StartsFalling");
         }
     }
 
@@ -135,9 +147,11 @@ public class CharacterController2D : MonoBehaviour
         // If the player should jump...
         if (m_Grounded && jump)
         {
+            jumpStarted = true;
             // Add a vertical force to the player.
             m_Grounded = false;
             m_Rigidbody2D.velocity = m_Rigidbody2D.velocity + new Vector2(0f, m_JumpForce/100);
+            animator.SetTrigger("StartJumping");
             //m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
         }
 
@@ -145,10 +159,12 @@ public class CharacterController2D : MonoBehaviour
 
     public void Dash()
     {
-        DashEffect.SetActive(true);
+        //DashEffect.SetActive(true);
+        trail.enabled = true;
         IsDashing = true;
         m_Rigidbody2D.gravityScale = 0;
         m_Rigidbody2D.velocity = new Vector2(m_DashVeclocity, 0);
+        animator.SetBool("IsDashing", true);
         Invoke("FinishDashing", m_DashTime);
     }
 
@@ -156,7 +172,9 @@ public class CharacterController2D : MonoBehaviour
     {
         m_Rigidbody2D.gravityScale = 1;
         m_Rigidbody2D.velocity = Vector2.zero;
-        DashEffect.SetActive(false);
+        //DashEffect.SetActive(false);
+        animator.SetBool("IsDashing", false);
+        trail.enabled = false;
         IsDashing = false;
     }
 
