@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Attacker.cs" />
+    <Compile Include="Assets\AudioEffects.cs" />
     <Compile Include="Assets\GameController.cs" />
     <Compile Include="Assets\GlobalGameController.cs" />
     <Compile Include="Assets\herizo.cs" />

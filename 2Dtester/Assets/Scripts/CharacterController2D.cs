@@ -25,17 +25,21 @@ public class CharacterController2D : MonoBehaviour
     public event EventHandler Landed;
     public Animator animator;
     public bool IsDashing = false;
-    public TrailRenderer trail;
+    public ParticleSystem trail;
+    public int MaxNumOfJumps = 2;
 
     const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
     private bool jumpStarted;
     private bool m_Grounded;            // Whether or not the player is grounded.
+    private int CurrentNumOfJumps = 0;
 
 
     const float k_CeilingRadius = .2f; // Radius of the overlap circle to determine if the player can stand up
     private Rigidbody2D m_Rigidbody2D;
     private bool m_FacingRight = true;  // For determining which way the player is currently facing.
     private Vector3 m_Velocity = Vector3.zero;
+
+    private AudioEffects AudioPlayer;
     
     
 
@@ -61,6 +65,7 @@ public class CharacterController2D : MonoBehaviour
 
     private void Awake()
     {
+        AudioPlayer = GetComponent<AudioEffects>();
         m_Rigidbody2D = GetComponent<Rigidbody2D>();
 
         if (OnLandEvent == null)
@@ -97,11 +102,7 @@ public class CharacterController2D : MonoBehaviour
                 m_Grounded = true;
                 if (!wasGrounded)
                 {
-                    jumpStarted = false;
-                    isFreeFalling = false;
-                    animator.SetTrigger("Landed");
-                    Landed?.Invoke(this, EventArgs.Empty);
-                    OnLandEvent.Invoke();
+                    Land();
                 }
             }
         }
@@ -147,20 +148,40 @@ public class CharacterController2D : MonoBehaviour
         // If the player should jump...
         if (m_Grounded && jump)
         {
-            jumpStarted = true;
-            // Add a vertical force to the player.
-            m_Grounded = false;
-            m_Rigidbody2D.velocity = m_Rigidbody2D.velocity + new Vector2(0f, m_JumpForce/100);
-            animator.SetTrigger("StartJumping");
-            //m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
+            Jump();
         }
+        else if(!m_Grounded && jump && CurrentNumOfJumps < MaxNumOfJumps)
+        {
+            Jump();
+        }
+    }
 
+    private void Land()
+    {
+        CurrentNumOfJumps = 0;
+        jumpStarted = false;
+        isFreeFalling = false;
+        animator.SetTrigger("Landed");
+        Landed?.Invoke(this, EventArgs.Empty);
+        OnLandEvent.Invoke();
+        AudioPlayer.PlayEffect(AudioEffects.Sounds.land);
+    }
+
+    private void Jump()
+    {
+        CurrentNumOfJumps++;
+        jumpStarted = true;
+        // Add a vertical force to the player.
+        m_Grounded = false;
+        m_Rigidbody2D.velocity = new Vector2( m_Rigidbody2D.velocity.x , m_JumpForce / 100);
+        animator.SetTrigger("StartJumping");
+        AudioPlayer.PlayEffect(AudioEffects.Sounds.jump);
     }
 
     public void Dash()
     {
         //DashEffect.SetActive(true);
-        trail.enabled = true;
+        trail.Play();
         IsDashing = true;
         m_Rigidbody2D.gravityScale = 0;
         m_Rigidbody2D.velocity = new Vector2(m_DashVeclocity, 0);
@@ -174,7 +195,7 @@ public class CharacterController2D : MonoBehaviour
         m_Rigidbody2D.velocity = Vector2.zero;
         //DashEffect.SetActive(false);
         animator.SetBool("IsDashing", false);
-        trail.enabled = false;
+        trail.Stop();
         IsDashing = false;
     }
 
