@@ -1,0 +1,35 @@
+habilidades
+
+correr (no andar)
+	needs animation
+	turn animation?
+
+salto
+	animation
+		jump (with preparation?)
+		fall
+		land
+		
+	simetrico o asimetrico?
+	doble salto?
+	ataque durante el salto
+	ataque hacía abajo durante el salto
+	
+ataque horizontal
+	needs animation
+	needs splash
+	
+ataque arriba
+	needs animation
+	reuse splash
+
+dash
+	needs animation
+	ataque durante el dash?
+	
+projectile ?
+
+
+
+
+	
